@@ -1,0 +1,150 @@
+<x-app-layout>
+    <!-- BEGIN: Content-->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-header row">
+                <div class="content-header-left col-md-9 col-12 mb-2">
+                    <div class="row breadcrumbs-top">
+                        <div class="col-12">
+                            <h2 class="content-header-title float-start mb-0">Create Parcel</h2>
+                            <div class="breadcrumb-wrapper">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active"><a
+                                            href="{{ route('parcels.index') }}">Parcels</a>
+                                    </li>
+                                    <li class="breadcrumb-item active">Create
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-body">
+                <section id="multiple-column-form">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    {{-- @include('layouts.validation.message') --}}
+                                    <form class="form" action="{{ route('parcels.store') }}" method="POST"
+                                        enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="row">
+                                            @if (auth()->user()->hasRole('admin'))
+                                                <div class="col-sm-4 col-12">
+                                                    <div class="mb-1">
+                                                        <label class="form-label" for="user_id">Select User<span
+                                                                class="text-danger">*</span></label>
+                                                        <select id="user_id" name="user_id"
+                                                            class="select2 form-select">
+                                                            <option value="">Select User</option>
+                                                            @foreach ($users as $key => $user)
+                                                                <option value="{{ $user['id'] }}">
+                                                                    {{ $user['name'] }} | {{ $user['po_box_number'] }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        <x-input-error class="" :messages="$errors->get('user_id')" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-8"></div>
+                                            @endif
+                                            @if (auth()->user()->hasRole('user'))
+                                                    <input type="hidden" name="user_id" id="user_id" class="form-control" value="{{ auth()->user()->id }}">
+                                            @endif
+                                            <div class="col-md-4 col-12">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="merchant">Sender’s Name<span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" id="merchant" class="form-control"
+                                                        name="merchant" value="{{ old('merchant') }}" />
+                                                    <x-input-error class="" :messages="$errors->get('merchant')" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="carrier">Your customer nick name or
+                                                        their code<span class="text-danger">*</span></label>
+                                                    <input type="text" id="carrier" class="form-control"
+                                                        name="carrier" value="{{ old('carrier') }}" />
+                                                    <x-input-error class="" :messages="$errors->get('carrier')" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="tracking_id">Your reference or order
+                                                        number <span class="text-danger">*</span></label>
+                                                    <input type="text" id="tracking_id" class="form-control"
+                                                        name="tracking_id" value="{{ old('tracking_id') }}" />
+                                                    <x-input-error class="" :messages="$errors->get('tracking_id')" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="additional_reference">Additional
+                                                        reference</label>
+                                                    <input type="text" id="additional_reference" class="form-control"
+                                                        name="additional_reference"
+                                                        value="{{ old('additional_reference') }}" />
+                                                    {{-- @if (auth()->check())
+                                                        @auth
+                                                            @if (Auth::user()->id != null)
+                                                                <input type="text" name="additional_reference"
+                                                                    class="form-control additional_reference"
+                                                                    id="additional_reference" readonly
+                                                                    value="{{ Auth::user()->name . ' - ' . str_pad(Auth::user()->id, 4, '0', STR_PAD_LEFT) ?? old('additional_reference') }}"
+                                                                    maxlength="20" oninput="restrictInputLength(this, 100)">
+                                                            @else
+                                                                <input type="text" name="additional_reference"
+                                                                    class="form-control additional_reference"
+                                                                    id="additional_reference" readonly
+                                                                    value="{{ Auth::user()->name . ' - ' . str_pad(Auth::user()->id, 4, '0', STR_PAD_LEFT) ?? old('additional_reference') }}"
+                                                                    maxlength="20" oninput="restrictInputLength(this, 100)">
+                                                            @endif
+                                                        @endauth
+                                                    @endif --}}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-12 mb-1 position-relative">
+                                                <label class="form-label" for="date">Date<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" name="date" id="date"
+                                                    class="form-control flatpickr-basic" placeholder="YYYY-MM-DD"
+                                                    value="{{ old('date') }}" />
+                                                <x-input-error class="" :messages="$errors->get('date')" />
+                                            </div>
+                                            <div class="col-lg-4 col-md-12 mb-1 mb-sm-0">
+                                                <label for="formFile" class="form-label">Invoice</label>
+                                                <input class="form-control" type="file" id="formFile"
+                                                    name="image">
+                                                <x-input-error class="" :messages="$errors->get('image')" />
+                                                {{-- @error('weight') <span class="text-danger">{{ $message }}</span> @enderror --}}
+                                            </div>
+                                            {{-- <livewire:parcels.shipment , ['errors' => $errors] /> --}}
+                                            @livewire('parcels.shipment', ['errors' => $errors])
+                                            <div
+                                                class="content-header-right text-md-end col-md-12 col-12 d-md-block d-none">
+                                                <div class="col-12">
+                                                    <button type="submit"
+                                                        class="btn btn-primary me-1">Submit</button>
+                                                    <button type="reset"
+                                                        class="btn btn-outline-secondary">Reset</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- END: Content-->
+</x-app-layout>
